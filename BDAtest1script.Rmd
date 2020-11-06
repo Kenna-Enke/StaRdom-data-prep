@@ -227,7 +227,7 @@ abs_norm = TRUE # e.g. TRUE, c(700,800) #changed from FALSE
 # Please use a meta table (above) if your dilutions are differing
 # 1 for no dilution, 10 for dilution 1:10 (1 part sample and 9
 # parts ultrapure water), "meta" for data from meta table
-dilution = "meta" # e.g. 1
+dilution = 1 # e.g. 1
 
 # In case of diluted samples, two absorbance measurements of the
 # same sample in different dilutions might be present. If this is
@@ -251,10 +251,14 @@ spectral_cor = FALSE # e.g. TRUE, set to FALSE, if your instrument already provi
 # Set a vector with range of wavelengths to be plotted and saved.
 # Peak picking is done before range reduction.
 # Emission wavelength:
-em_range = c(250,800) # e.g. c(300,500), c(0,Inf) to use everything #changed from (0,Inf) to (250,800)
+em_range = c(250,450) 
+# changed from (250, 800) to (250, 450) to match the range of the data
+# e.g. c(300,500), c(0,Inf) to use everything #changed from (0,Inf) to (250,800)
 
 # Excitation wavelength:
-ex_range = c(250,800) # e.g. c(300,500), c(0,Inf) to use everything #same as above
+ex_range = c(250,450) 
+# changed from (250, 800) to (240, 450) to match the range of the abs data
+# e.g. c(300,500), c(0,Inf) to use everything #same as above
 
 # Cut all samples to fit largest range available in all samples
 cut_range_to_smallest = TRUE # e.g. FALSE #set to TRUE
