@@ -251,14 +251,14 @@ spectral_cor = FALSE # e.g. TRUE, set to FALSE, if your instrument already provi
 # Set a vector with range of wavelengths to be plotted and saved.
 # Peak picking is done before range reduction.
 # Emission wavelength:
-em_range = c(250,450) 
-# changed from (250, 800) to (250, 450) to match the range of the data
+em_range = c(300,550) 
+# Changed to 350 to 550 to capture interesting parts of spectrum
 # e.g. c(300,500), c(0,Inf) to use everything #changed from (0,Inf) to (250,800)
 
 # Excitation wavelength:
-ex_range = c(250,450) 
-# changed from (250, 800) to (240, 450) to match the range of the abs data
-# e.g. c(300,500), c(0,Inf) to use everything #same as above
+ex_range = c(240,400) 
+# Changed to 240 to 400 to capture interesting parts of spectrum
+# # e.g. c(300,500), c(0,Inf) to use everything
 
 # Cut all samples to fit largest range available in all samples
 cut_range_to_smallest = TRUE # e.g. FALSE #set to TRUE
@@ -282,13 +282,17 @@ ife_correction = TRUE # e.g. FALSE # I changed it to true, then back to false, l
 #### Remove scattering and interpolate missing data ####
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 # Scattering is removed from the EEM spectra.
-remove_scatter <- c(TRUE, TRUE, TRUE, TRUE) # logical values, ordered by raman1,raman2,rayleigh1,rayleigh2
+
+remove_scatter <- c(TRUE,TRUE,TRUE,TRUE) # logical values, ordered by raman1,raman2,rayleigh1,rayleigh2
 
 # Set the width of removed scatter slot (usually 10 to 20).
 # If you can still see traces of scattering after interpolation,
 # this value should be increased. You can specify a vector containing
 # separate widths for each scatter c(15,16,16,14), ordered by raman1,raman2,rayleigh1,rayleigh2.
-remove_scatter_width = c(15, 15, 20, 20) # e.g. 15 or c(15,15,15,15) #originally c(15,20,15,18)
+remove_scatter_width = c(10, 10, 35, 15) # e.g. 15 or c(15,15,15,15) #originally c(15,20,15,18)
+
+# BPC: 1st order Rayleigh has a shoulder 25nm shorter wavelength. This is weird.
+# Big width eliminates it, but need to look into this more.
 
 # state whether removed scattering should be interpolated
 interpolation <- FALSE # e.g. TRUE #set to FALSE
@@ -366,7 +370,7 @@ if(metadata != FALSE){
 if(absorbance_dir != FALSE){
   abs_data <- absorbance_read(absorbance_dir, verbose = TRUE, cores = 2)
   if(abs_norm != FALSE){
-    if(abs_norm == TRUE) abs_norm <- c(240, 450) # CHANGED C(240, 700) TO C(240,450)
+    if(abs_norm == TRUE) abs_norm <- c(240, 600) # CHANGED C(240, 700) TO C(240,600)
     abs_data <- abs_blcor(abs_data,abs_norm)
   }
 }
@@ -380,6 +384,12 @@ if(absorbance_dir != FALSE){
 # the data is checked for several often occuring problems. Most of them are related to how you organised your data.
 # if the script stops here please have a look at the error messages and correct your data.
 eem_checkdata(eem_list,abs_data, error = FALSE)
+# BPC: Set em_range to 250 to 450 and ex_range to 260 to 440 and got the following warning: BD200625S01R1 : 
+# absorbance wavelength range is smaller than emission wavelength range, 
+# inner-filter effect correction is impossible!
+# 
+# Set em_range to 250 to 450 and ex_range to 250 to 450
+
 ```
 
 ```{r message=FALSE, warning=TRUE, include=FALSE}
