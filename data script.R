@@ -145,10 +145,27 @@ local.absorbance <- gsub("absorbance_temp", "absorbance_new", local.absorbance)
 
 names(all.files.absorbance) <- local.absorbance
 
+# We ere getting errors because the absorbance wavelength (240 to 450) range was 
+# smaller than the emission wavelength range (250 to ~800) before truncating
+# the data. This is important, as doing the inner filter correction requires
+# absorbance data for the whole range. For most of the data, absorbance is pretty
+# small at 450. One possibility is to set all values over 450 to 0, and thus 
+# there wouldn't be any inner filter correction out past this level. To do this,
+# we create "filler" data, then merge it with the absorbance data using rbind. 
+# Filler data were originally 0, and this was not OK. Changed to 0.00001, which
+# was still not OK. Changed to 0.001, and no problems. Go figure.
+# 
+# Creating filler data for adjusting the dataframes and rbind to combine.
+
+filler <- data.frame(V1 = seq(600, 452, -2), V10 = 0.001)
+filler$V1 <- as.integer(filler$V1)
+all.files.absorbance <- lapply(all.files.absorbance, function(x) rbind(filler, x))
+
 # Now, use a for loop to export each data frame in the list to a file having the
 # corresponding name that we assigned the dataframes within the list.
+
 for(i in 1:length(all.files.absorbance)) {
-  write.table(all.files.absorbance[i], 
+    write.table(all.files.absorbance[i], 
               sep = "\t",
               file = names(all.files.absorbance[i]),
               col.names = FALSE, row.names = FALSE)
@@ -166,12 +183,18 @@ local.waterfall <- grep(list.files(path = "./input/waterfall_temp",
 
 all.files.waterfall <- lapply(local.waterfall, read.delim, header = TRUE)
 
-
 local.waterfall <- gsub("waterfall_temp", "waterfall_new", local.waterfall)
 
 names(all.files.waterfall) <- local.waterfall
 
 names(all.files.waterfall[1])
+
+# BPC: We were getting errors in the staRdom script for not having the same
+# range of wavelengths for absorbance and emission. To remedy this, I've created
+# this code to subset the first 90 rows in the waterfall plots (and I'll do the
+# same for the blank waterfall plots).
+
+all.files.waterfall <- lapply(all.files.waterfall, function(x) return(x[1:154, ]))
 
 for(i in 1:length(all.files.waterfall)) {
   write.table(all.files.waterfall[i], 
@@ -188,15 +211,12 @@ local.waterfall.blank <- list.files(path = "./input/waterfall_temp",
 all.files.waterfall.blank <- lapply(local.waterfall.blank, 
                                     read.delim, header = TRUE)
 
-# all.files.waterfall <- lapply(all.files.waterfall, function(x) {
-#   colnames(x) <- gsub("X", "", colnames(x))
-#   return(x)
-# })
-
 local.waterfall.blank <- gsub("waterfall_temp", "waterfall_new", 
                               local.waterfall.blank)
 
 names(all.files.waterfall.blank) <- local.waterfall.blank
+
+all.files.waterfall.blank <- lapply(all.files.waterfall.blank, function(x) return(x[1:154, ]))
 
 
 for(i in 1:length(all.files.waterfall.blank)) {
