@@ -13,6 +13,7 @@ library(readr)
 # Separating files based on file names----
 # creates lists of the blank waterfall files, sample waterfall files, and absorbance 
 # files so later we can separate files into folders according to these lists
+options(scipen=999)
 files.blank <- list.files(path = "./Project Files", 
                                     full.names = TRUE, recursive = TRUE,
                                     pattern = "Waterfall Plot Blank")
@@ -145,7 +146,7 @@ local.absorbance <- gsub("absorbance_temp", "absorbance_new", local.absorbance)
 
 names(all.files.absorbance) <- local.absorbance
 
-# We ere getting errors because the absorbance wavelength (240 to 450) range was 
+# We were getting errors because the absorbance wavelength (240 to 450) range was 
 # smaller than the emission wavelength range (250 to ~800) before truncating
 # the data. This is important, as doing the inner filter correction requires
 # absorbance data for the whole range. For most of the data, absorbance is pretty
