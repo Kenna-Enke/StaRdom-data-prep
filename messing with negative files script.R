@@ -1,11 +1,13 @@
-bad3 <- read.delim("./input/absorbance_new/BD200804S12R3.txt", sep = "\t", 
+BD1 <- read.delim("./input/absorbance_new/BD200804S14R1.txt", sep = "\t", 
                    header = FALSE)
-good1 <- read.delim("./input/absorbance_new/BD200804S12R1.txt", sep = "\t",
+BD2 <- read.delim("./input/absorbance_new/BD200804S14R2.txt", sep = "\t",
                     header = FALSE)
-good2 <- read.delim("./input/absorbance_new/BD200804S12R2.txt", sep = "\t",
+BD3 <- read.delim("./input/absorbance_new/BD200804S14R3.txt", sep = "\t",
                     header = FALSE)
 
 ggplot()+
-  geom_line(data = good1, aes(x = V1, y = V2))+
-  geom_line(data = bad3, aes(x = V1, y = V2), color = "red")+
-  geom_line(data = good2, aes(x = V1, y = V2), color = "blue")
+  geom_line(data = BD1, aes(x = V1, y = V2))+
+  geom_line(data = BD2, aes(x = V1, y = V2), color = "red")+
+  geom_line(data = BD3, aes(x = V1, y = V2), color = "blue")
+
+
