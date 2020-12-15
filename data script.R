@@ -1,4 +1,5 @@
 # This is for manipulating our raw data into a form that we can use for staRdom 
+# 
 # In this script we are:
 # separating data files into two folders, absorbance and waterfall
 # Absorbance goes into the absorbance file, waterfall and blank into waterfall
@@ -6,10 +7,17 @@
 # Finally we are reshaping our data to match the requirements from staRdom
 # From here, you should be able to take the two final input folders and plug them
 # directly into staRdom
+# 
+# This script:
+#   1) Copies EEMS and abs files from individual dirs into shared directorys
+#   2) Renames the files to a format useable in staRdom
+#   3) Reshapes the files and copies them to a new directory
+#   
 # Loading relevant packages----
 library(tidyr)
 library(dplyr)
 library(readr) 
+
 # Separating files based on file names----
 # creates lists of the blank waterfall files, sample waterfall files, and absorbance 
 # files so later we can separate files into folders according to these lists
@@ -61,12 +69,14 @@ files.blank.sep <- separate(files.blank.new, names,
                             sep = c(23, 36, -9, -3))
 # now we need to correct the suffix: staRdom needs either .txt or .csv files so we are changing "dat" to "txt"
 files.blank.sep$suffix <- "txt"
+
 # now we are taking the parts of the name we want ("directory" + "sample" + "blank" + "suffix") and combining them under a new column "names"
 files.blank.unite <- unite(files.blank.sep, names, 
                            c("directory", "sample", "blank", "suffix"), 
                            sep = "", remove = TRUE)
 # now we need to take only the "names" column to use as our new file names- removing "temp"
 files.blank.unite <- select(files.blank.unite, "names")
+
 # For Waterfall
 # we now want four columns as we no longer want a "blank" column, that part gets absorbed into "temp"
 files.waterfall.sep <- separate(files.waterfall.new, names, 
@@ -77,6 +87,7 @@ files.waterfall.unite <- unite(files.waterfall.sep, names,
                                c("directory", "sample", "suffix"), 
                                sep = "", remove = TRUE)
 files.waterfall.unite <- select(files.waterfall.unite, "names")
+
 # For Absorbance
 # this is the same format as waterfall except it has more letters in the name than the either two, so you have to change 'sep =' to reflect that
 files.absorbance.sep <- separate(files.absorbance.new, names, 
@@ -87,6 +98,7 @@ files.absorbance.unite <- unite(files.absorbance.sep, names,
                                 c("directory", "sample", "suffix"), 
                                 sep = "", remove = TRUE)
 files.absorbance.unite <- select(files.absorbance.unite, "names")
+
 ##Renaming files in temp directories-----
 # We want to rename the files in their respective new 'temp' directories. This 
 # means going: 
@@ -100,24 +112,7 @@ file.rename(from = as.vector(files.waterfall.new$names),
             to = as.vector(files.waterfall.unite$names))
 file.rename(from = as.vector(files.absorbance.new$names), 
             to = as.vector(files.absorbance.unite$names))
-# Reshaping data test run----
-# For absorbance data, reshape the absorbance data by importing using 
-# read.delim(), eliminating headers and extraneous columns, then exporting to 
-# input/absorbance. 
-# Let's test with one file, then redo it to do all files.
-# df <- read.delim("./input/absorbance_temp/BD200625S01R1.txt", 
-#                  header = FALSE, skip = 3)
-# df <- select(df, c(1, 10))
-# write_delim(df, path = "./input/absorbance_new/df", delim = "\t", 
-#             col_names = FALSE)
-# # If using sample - blank waterfall plot, reshape the data by
-# # importing, removing the second row, changing header for column 1 to 
-# # "Wavelength", and exporting to input/waterfall
-# 
-# df2 <- read.delim("./input/waterfall_temp/BD200625S14R3.txt", header = TRUE)
-# colnames(df2) <- gsub("X", "", colnames(df2))
-# write_delim(df2, path = "./input/waterfall_new/df2", delim = "\t", 
-#             col_names = TRUE)
+
 
 # Reshaping all files----
 # We can use lapply to do the reshaping and copying to the appropriate "_new" 
@@ -145,15 +140,22 @@ local.absorbance <- gsub("absorbance_temp", "absorbance_new", local.absorbance)
 
 names(all.files.absorbance) <- local.absorbance
 
-# We ere getting errors because the absorbance wavelength (240 to 450) range was 
-# smaller than the emission wavelength range (250 to ~800) before truncating
-# the data. This is important, as doing the inner filter correction requires
-# absorbance data for the whole range. For most of the data, absorbance is pretty
-# small at 450. One possibility is to set all values over 450 to 0, and thus 
-# there wouldn't be any inner filter correction out past this level. To do this,
-# we create "filler" data, then merge it with the absorbance data using rbind. 
-# Filler data were originally 0, and this was not OK. Changed to 0.00001, which
-# was still not OK. Changed to 0.001, and no problems. Go figure.
+# We were getting errors because the absorbance wavelength (240 to 450) range was 
+# smaller than the emission wavelength range (250 to ~800). While staRdom does
+# allow one to select the wavelengths to be plotted and saved through "em_range"
+# and "ex_range", it does peak picking and inner filter effect correction
+# beforehand and thus having a lack of overlap between absorbance and the
+# excitation wavelength was a problem. We should change the setup for the 
+# Aqualog to avoid this problem (scan from 240 to 550 at least). 
+# 
+# Luckily, absorbance is pretty small beyond 450 and we should be OK if we
+# put in some filler values (but need to note this in the methods). The first
+# attempt at doing this was to set all absorbance values over 450 to a low value
+# minimizing any inner filter correction out past this level. To do this,
+# we create "filler" data, then merge it with the absorbance data using "rbind". 
+# Filler data were originally 0, and this threw errors. Changed to 0.00001, which
+# caused further errors. Changed to 0.001, and no problems. Errors were
+# "pattern" errors.
 # 
 # Creating filler data for adjusting the dataframes and rbind to combine.
 
@@ -171,10 +173,11 @@ for(i in 1:length(all.files.absorbance)) {
               col.names = FALSE, row.names = FALSE)
 }
 
-# Let's try for waterfalls. We'll use 'grep' paired with invert to just choose
-# the sample plots. Same steps as above, except we need to add column names.
-# Tried to have it write the column names from the dataframes, but it added
-# the file name to each one, and thus made it a mess. Instead, we overwrite them.
+# For reshaping waterfalls, we will:
+#   1) use "grep" paired with invert to just choose the "sample" data
+#   2) Use "lapply" and "read.delim" to import the data into a list 
+#   3) Use "gsub to create new filenames in a new path
+#   4) Use "names" to rename the elements in the list 
 
 local.waterfall <- grep(list.files(path = "./input/waterfall_temp", 
                                    full.names = TRUE),
@@ -187,14 +190,16 @@ local.waterfall <- gsub("waterfall_temp", "waterfall_new", local.waterfall)
 
 names(all.files.waterfall) <- local.waterfall
 
-names(all.files.waterfall[1])
-
-# BPC: We were getting errors in the staRdom script for not having the same
-# range of wavelengths for absorbance and emission. To remedy this, I've created
-# this code to subset the first 90 rows in the waterfall plots (and I'll do the
-# same for the blank waterfall plots).
+# We were getting errors in the staRdom script for not having the same
+# range of wavelengths for absorbance and emission. Above, we created some filler
+# absorbance data to fill absorbance data out to 600 nm. We also need to trim 
+# down the EEMS data. To remedy this, we can use lapply to only select the first 
+# 154 rows, which covers from ~250 to <600 nm.
 
 all.files.waterfall <- lapply(all.files.waterfall, function(x) return(x[1:154, ]))
+
+# Write all list elements to new files using the element names as the file
+# names.
 
 for(i in 1:length(all.files.waterfall)) {
   write.table(all.files.waterfall[i], 
