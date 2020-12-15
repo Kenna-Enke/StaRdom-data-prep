@@ -22,6 +22,7 @@ library(readr)
 # creates lists of the blank waterfall files, sample waterfall files, and absorbance 
 # files so later we can separate files into folders according to these lists
 options(scipen=999)
+
 files.blank <- list.files(path = "./Project Files", 
                                     full.names = TRUE, recursive = TRUE,
                                     pattern = "Waterfall Plot Blank")
@@ -32,6 +33,7 @@ files.waterfall <- list.files(path = "./Project Files",
 files.absorbance <- list.files(path = "./Project Files",
                                full.names = TRUE, recursive = TRUE,
                                pattern = "Abs")
+
 # Moving to temporary folders----
 # Once in temp folders we can then modify the data structure to match StaRdom
 # Specifically we want the file names to be 'BDYYMMDDS##R#(Blank if blank 
@@ -66,9 +68,26 @@ files.absorbance.new <- data.frame(names = files.absorbance.new)
 # in order to get these we are separating them (sep = ) by counting out how many
 # letters are in each part
 files.blank.sep <- separate(files.blank.new, names, 
-                            c("directory", "sample", "temp", "blank", "suffix"), 
-                            sep = c(23, 36, -9, -3))
+                            c("directory", "sample", "number", "temp", "blank", "suffix"), 
+                            sep = c(23, 36, -27, -9, -3))
+
+# Checking for what at first appear to be duplicate runs of samples. In reality,
+# these could be reruns, or they could be samples wehre the sample ID wasn't 
+# changed, but a new sample was run, or where the previous sample in the list was
+# run, but with a new label, and then the actual sample was run as a rerun.
+# This is reflected in the number term in parentheses in each original file name
+# (e.g., "(01)" for the first, "(02)" for the second). To check, we can filter
+# by number
+
+filter(files.blank.sep, number == " (02)")
+filter(files.blank.sep, number == " (03)")
+
+# If there are no rows, then there are no duplicates. If there are rows, that 
+# means there are duplicates or triplicates and some sleuthing needs to be done
+# to figure out why. 
+
 # now we need to correct the suffix: staRdom needs either .txt or .csv files so we are changing "dat" to "txt"
+
 files.blank.sep$suffix <- "txt"
 
 # now we are taking the parts of the name we want ("directory" + "sample" + "blank" + "suffix") and combining them under a new column "names"
@@ -157,13 +176,30 @@ names(all.files.absorbance) <- local.absorbance
 # Filler data were originally 0, and this threw errors. Changed to 0.00001, which
 # caused further errors. Changed to 0.001, and no problems. Errors were
 # "pattern" errors.
-#  Go figure.
+# Go figure.
 # 
 # Creating filler data for adjusting the dataframes and rbind to combine.
 
-filler <- data.frame(V1 = seq(600, 452, -2), V10 = 0.001)
+filler <- data.frame(V1 = seq(600, 452, -2), V10 = 0.001) # 0.001 is a placeholder
 filler$V1 <- as.integer(filler$V1)
-all.files.absorbance <- lapply(all.files.absorbance, function(x) rbind(filler, x))
+all.files.absorbance <- lapply(all.files.absorbance, 
+                               function(x) rbind(filler, x))
+
+
+# Another option would be to replace the "0.001" from above with the absorbance 
+# at 450 for each absorbance scan. I got that to work, but then realized that
+# for some scans, there is a pretty high value at 450, and that isn't likely
+# a good fit. Code is below for reference.
+# 
+# all.files.absorbance <- Map(cbind, 
+#     lapply(all.files.absorbance, function(x) x$V1), 
+#     lapply(all.files.absorbance, function(x) if_else(x$V1 > 450, x[76,2], x$V10)))
+
+# The best option would be to fit the abs from 240 to 450 which is log linear 
+# and then extrapolate from 450 to 600 censoring it if it gets below 0.001. I 
+# can do that easily for an individual data frame, but need to figure out how to 
+# make it work in a list. I can fit the model, but not calculate the prediction.
+
 
 # Now, use a for loop to export each data frame in the list to a file having the
 # corresponding name that we assigned the dataframes within the list.
@@ -233,3 +269,4 @@ for(i in 1:length(all.files.waterfall.blank)) {
               col.names = c("Wavelength", seq(from = 450, to = 240, by = -2)),
               row.names = FALSE)
 }
+
