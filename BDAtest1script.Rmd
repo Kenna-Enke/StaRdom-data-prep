@@ -3,7 +3,7 @@ title: "BDAtest1script"
 author: "Kenna"
 date: "7/8/2020"
 knit: (function(inputFile, encoding) {
-      output_dir = './output';
+      output_dir = 'C:/Users/Cupcake/Documents/Stardom-data-prep/output';
       rmarkdown::render(inputFile,
                         encoding=encoding, 
                         output_file=file.path(output_dir,paste0('DOM_EEM_analysis_report_',format(Sys.time(), "%Y%m%d_%H%M%S"),'.htm')))
@@ -57,7 +57,7 @@ library(staRdom)
 # Set the directory where all output files are put in.
 # The directory is automatically created if it does not exist.
 # Folder delimiters can be / or \\. \ , as it is usually used in Windows, will not work!
-output_dir = "./output" # e.g. output_dir = "C:/some_folder/output/"
+output_dir = "C:/Users/Cupcake/Documents/Stardom-data-prep/output" # e.g. output_dir = "C:/some_folder/output/"
 
 ```
 

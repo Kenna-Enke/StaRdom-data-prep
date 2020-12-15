@@ -21,6 +21,7 @@ library(readr)
 # Separating files based on file names----
 # creates lists of the blank waterfall files, sample waterfall files, and absorbance 
 # files so later we can separate files into folders according to these lists
+options(scipen=999)
 files.blank <- list.files(path = "./Project Files", 
                                     full.names = TRUE, recursive = TRUE,
                                     pattern = "Waterfall Plot Blank")
@@ -156,6 +157,7 @@ names(all.files.absorbance) <- local.absorbance
 # Filler data were originally 0, and this threw errors. Changed to 0.00001, which
 # caused further errors. Changed to 0.001, and no problems. Errors were
 # "pattern" errors.
+#  Go figure.
 # 
 # Creating filler data for adjusting the dataframes and rbind to combine.
 
