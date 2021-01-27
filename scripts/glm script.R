@@ -89,30 +89,36 @@ par(mfrow = c(2,2))
 plot(bix.stream.loation.date.glm)
 # OH MY GOD THIS IS SO EXCITING
 # ok, let's do all my indices
-bix.stream.loation.date.glm <- glm(bix ~ stream*location*date,
+bix.stream.location.date.glm <- glm(bix ~ stream*location*date,
                                    data = BDA,
                                    family = gaussian(link="identity"))
-t.stream.loation.date.glm <- glm(t ~ stream*location*date,
+t.stream.location.date.glm <- glm(t ~ stream*location*date,
                                    data = BDA,
                                    family = gaussian(link="identity"))
-a.stream.loation.date.glm <- glm(a ~ stream*location*date,
+a.stream.location.date.glm <- glm(a ~ stream*location*date,
                                    data = BDA,
                                    family = gaussian(link="identity"))
-c.stream.loation.date.glm <- glm(c ~ stream*location*date,
+c.stream.location.date.glm <- glm(c ~ stream*location*date,
                                    data = BDA,
                                    family = gaussian(link="identity"))
-fi.stream.loation.date.glm <- glm(fi ~ stream*location*date,
+fi.stream.location.date.glm <- glm(fi ~ stream*location*date,
                                    data = BDA,
                                    family = gaussian(link="identity"))
-hix.stream.loation.date.glm <- glm(hix ~ stream*location*date,
+hix.stream.location.date.glm <- glm(hix ~ stream*location*date,
                                    data = BDA,
                                    family = gaussian(link="identity"))
 par(mfrow = c(2,2))
-plot(bix.stream.loation.date.glm)
-plot(t.stream.loation.date.glm)
-plot(a.stream.loation.date.glm)
-plot(c.stream.loation.date.glm)
-plot(fi.stream.loation.date.glm)
-plot(hix.stream.loation.date.glm)
-
+plot(bix.stream.location.date.glm)
+plot(t.stream.location.date.glm)
+plot(a.stream.location.date.glm)
+plot(c.stream.location.date.glm)
+plot(fi.stream.location.date.glm)
+plot(hix.stream.location.date.glm)
+summary(bix.stream.location.date.glm)
+(1-bix.stream.location.date.glm$deviance/bix.stream.location.date.glm$null.deviance)
+(1-t.stream.location.date.glm$deviance/t.stream.location.date.glm$null.deviance)
+(1-a.stream.location.date.glm$deviance/a.stream.location.date.glm$null.deviance)
+(1-c.stream.location.date.glm$deviance/c.stream.location.date.glm$null.deviance)
+(1-fi.stream.location.date.glm$deviance/fi.stream.location.date.glm$null.deviance)
+(1-hix.stream.location.date.glm$deviance/hix.stream.location.date.glm$null.deviance)
 
