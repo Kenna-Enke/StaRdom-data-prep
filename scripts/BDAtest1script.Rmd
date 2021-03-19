@@ -37,6 +37,7 @@ This report was created using the R package staRdom version `r packageVersion("s
 library(dplyr)
 library(tidyr)
 library(staRdom)
+library(eemR)
 #
 ####################################
 #### Documentation of this file ####
@@ -57,7 +58,7 @@ library(staRdom)
 # Set the directory where all output files are put in.
 # The directory is automatically created if it does not exist.
 # Folder delimiters can be / or \\. \ , as it is usually used in Windows, will not work!
-output_dir = "C:/Users/Cupcake/Documents/Stardom-data-prep/output" # e.g. output_dir = "C:/some_folder/output/"
+output_dir = "./output" # e.g. output_dir = "C:/some_folder/output/"
 
 ```
 
@@ -74,8 +75,8 @@ output_dir = "C:/Users/Cupcake/Documents/Stardom-data-prep/output" # e.g. output
 # Import is done with eem.read() (package eemR), please see details there.
 # The template refers to data coming with the package. Please use your data
 # by setting the path to your files!
-sample_dir = "./input/waterfall_new"
-input_dir= "./input/waterfall_new"
+sample_dir = "C:/Users/Cupcake/Documents/StaRdom-data-prep/input/waterfall_new"
+input_dir= "C:/Users/Cupcake/Documents/StaRdom-data-prep/input/waterfall_new"
 #, system.file() accesses the example data coming with the package!
 # Set the used instrument (with hyphens!):
 # Cary Eclipse: "cary" 
@@ -96,7 +97,7 @@ fluorometer = "aqualog"
 # Those steps can be skipped but keep in mind it is important for a profound analysis!
 #
 # path of adsorbance data as directory or single file, sub folders are not read:
- absorbance_dir = "./input/absorbance_new"
+ absorbance_dir = "C:/Users/Cupcake/Documents/StaRdom-data-prep/input/absorbance_new"
 #package = "staRdom" 
 # e.g. absorbance_dir = "C:/some_folder/input/absorbance/", system.file() accesses the exmaple data coming with the package!
 

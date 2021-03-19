@@ -24,7 +24,7 @@ library(readr)
 options(scipen=999)
 
 # Selecting the correct date
-BD <- list.files(path = "./Files by dates/BD190724/files",
+BD <- list.files(path = "./Files by dates/BD200709/files",
                  full.names = TRUE, recursive = TRUE, all.files = TRUE)
 BD
 for (f in BD) file.copy(from = f, to = "./Project Files")
@@ -67,7 +67,7 @@ files.absorbance.new <- data.frame(names = files.absorbance.new)
 # information and leave the rest behind.
 # This will allow our files to be plugged directly in the staRdom package later
 # For Blank
-# Our current file names look like: "./input/waterfall_temp/BD200625S01R1 
+# Our current file names look like: "".input/waterfall_temp/BD200625S01R1 
 # (01)-Waterfall Plot Blank.dat"
 # We want to separate this into five columns: "directory", "sample", "temp", 
 # "blank", "suffix"

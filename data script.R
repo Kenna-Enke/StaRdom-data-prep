@@ -23,6 +23,12 @@ library(readr)
 # files so later we can separate files into folders according to these lists
 options(scipen=999)
 
+# Selecting the correct date
+BD <- list.files(path = "./Files by dates/BD200821/files",
+                 full.names = TRUE, recursive = TRUE, all.files = TRUE)
+BD
+for (f in BD) file.copy(from = f, to = "./Project Files")
+
 files.blank <- list.files(path = "./Project Files", 
                                     full.names = TRUE, recursive = TRUE,
                                     pattern = "Waterfall Plot Blank")

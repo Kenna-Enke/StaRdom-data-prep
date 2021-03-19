@@ -385,7 +385,10 @@ teeth <- toothgrowth %>%
                   rep("high", 5),
                   rep("low", 5),
                   rep("high", 5))) %>%
-  mutate(temp = as.factor(temp))
+  mutate(temp = as.factor(temp)) %>%
+  mutate(supp = ordered(supp, levels = c("VC", "OJ"))) %>%
+  mutate(temp = ordered(temp, levels = c("low", "high")))
+
 
 # Next, make a glm with dose, supp, and temp as predictors, and with width as
 # the response variable:
@@ -420,14 +423,15 @@ temp.cld <- cld(teeth.emm,
 temp.cld$.group <- gsub(" ", "", temp.cld$.group)
 temp.cld <- subset(temp.cld)
 
+
 ggplot() +
   geom_boxplot(data = teeth, 
                aes(x = temp, y = width)) +
   geom_text(data = temp.cld, 
             aes(x = temp, y = emmean, label = .group, 
-                vjust = -1.5, hjust = -0.3), 
-            position = position_dodge(0.75),
-            size = 5) +
-  scale_fill_brewer(palette = "Spectral") +
+                vjust = -1.5, hjust = -0.3), size = 5) +
   labs(x = "Temperature", y = "Width (mm)") +
   facet_grid(dose~supp, scales = "free_y")
+
+str(temp.cld)
+str(teeth)
